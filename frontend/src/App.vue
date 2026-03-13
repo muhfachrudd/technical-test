@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import MainTable from './components/MainTable.vue';
 import KanbanBoard from './components/KanbanBoard.vue';
 import TaskModal from './components/TaskModal.vue';
-import { Search, Users, SortDesc, Plus, LayoutGrid, List, ChevronDown, Home } from 'lucide-vue-next';
+import { Search, Users, SortDesc, ChevronDown, List, LayoutGrid, Home } from 'lucide-vue-next';
 
 const activeTab = ref('table');
 const showModal = ref(false);
@@ -55,67 +55,224 @@ const toggleSort = (key) => {
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-[#0F0F17] text-[#E1E1E6]">
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- Tabs Header -->
-      <div class="h-14 border-b border-[#232333] flex items-center px-6 gap-8">
-        <button @click="activeTab = 'table'" 
-                :class="['h-full flex items-center gap-2 px-2 text-[12px] font-medium border-b-2 transition-all transition-colors duration-200', 
-                         activeTab === 'table' ? 'border-blue-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300']">
-          <Home class="w-3.5 h-3.5" /> Main Table
-        </button>
-        <button @click="activeTab = 'kanban'" 
-                :class="['h-full flex items-center gap-2 px-2 text-[12px] font-medium border-b-2 transition-all transition-colors duration-200', 
-                         activeTab === 'kanban' ? 'border-blue-500 text-white' : 'border-transparent text-gray-500 hover:text-gray-300']">
-          Kanban
-        </button>
-        <button class="text-gray-600 hover:text-white pb-1">+</button>
+  <div class="app-layout">
+    <!-- TABS -->
+    <div class="tabs">
+      <button @click="activeTab = 'table'" 
+              :class="['tab', { active: activeTab === 'table' }]">
+        <Home class="tab-icon" /> Main Table
+      </button>
+      <button @click="activeTab = 'kanban'" 
+              :class="['tab', { active: activeTab === 'kanban' }]">
+        Kanban
+      </button>
+      <button class="tab-add">+</button>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="btn-new">
+        <button class="btn-new-main" @click="showModal = true">New task</button>
+        <button class="btn-new-caret"><ChevronDown class="icon-caret" /></button>
       </div>
 
-      <!-- Toolbar -->
-      <div class="p-6">
-        <div class="flex items-center gap-6 mb-8">
-          <div class="flex items-center">
-            <button @click="showModal = true" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-l-md flex items-center gap-2 text-[12px] font-medium transition-colors">
-              New task
-            </button>
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-2 py-2 rounded-r-md border-l border-white/10 transition-colors">
-              <ChevronDown class="w-3.5 h-3.5" />
-            </button>
-          </div>
+      <div class="toolbar-sep"></div>
 
-          <div class="flex items-center gap-5 text-gray-400">
-            <div class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors group">
-              <Search class="w-4 h-4" />
-              <input v-model="searchQuery" placeholder="Search" class="bg-transparent border-none text-[12px] w-24 focus:w-48 transition-all p-0">
-            </div>
-            <div class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
-              <Users class="w-4 h-4" />
-              <select v-model="personFilter" class="bg-transparent border-none p-0 text-[12px] cursor-pointer outline-none">
-                <option value="" class="bg-[#181824]">Person</option>
-                <option v-for="dev in developers" :key="dev" :value="dev" class="bg-[#181824]">{{ dev }}</option>
-              </select>
-            </div>
-            <div @click="sortConfig = []" class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
-              <SortDesc class="w-4 h-4" />
-              <span class="text-[12px]">Sort</span>
-            </div>
-          </div>
-        </div>
+      <div class="tb-action">
+        <Search class="icon-action" />
+        <input v-model="searchQuery" placeholder="Search" class="search-input" />
+      </div>
 
-        <div class="flex items-center gap-2 text-[13px] font-bold text-gray-300 mb-4 ml-2">
-            <ChevronDown class="w-4 h-4 text-purple-600" /> All Task
-        </div>
+      <div class="tb-action">
+        <Users class="icon-action" />
+        <select v-model="personFilter" class="dev-select">
+          <option value="">Person</option>
+          <option v-for="dev in developers" :key="dev" :value="dev">{{ dev }}</option>
+        </select>
+        <ChevronDown class="icon-mini" />
+      </div>
 
-        <div class="transition-all duration-300 overflow-x-auto">
-          <MainTable v-if="activeTab === 'table'" :tasks="filteredTasks" @update="updateTask" @sort="toggleSort" />
-          <KanbanBoard v-else :tasks="filteredTasks" @update="updateTask" />
-        </div>
+      <button class="tb-action" @click="sortConfig = []">
+        <SortDesc class="icon-action" /> Sort
+      </button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content">
+      <div class="section-label">
+        <ChevronDown class="icon-section" /> All Task
+      </div>
+
+      <MainTable v-if="activeTab === 'table'" :tasks="filteredTasks" @update="updateTask" @sort="toggleSort" />
+      
+      <div v-else class="placeholder-view">
+        <KanbanBoard :tasks="filteredTasks" @update="updateTask" />
       </div>
     </div>
 
-    <!-- Modal -->
+    <!-- MODAL -->
     <TaskModal v-if="showModal" @close="showModal = false" @save="addTask" />
   </div>
 </template>
+
+<style>
+/* Global resets for the app specifically */
+.app-layout {
+  min-height: 100vh;
+  background: #0D0D14;
+  color: #C8C8D8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  align-items: flex-end;
+  padding: 0 20px;
+  border-bottom: 1px solid #1E1E2E;
+  height: 50px;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 100%;
+  font-size: 12px;
+  font-weight: 500;
+  color: #555570;
+  border: none;
+  background: none;
+  border-bottom: 2.5px solid transparent;
+  cursor: pointer;
+  transition: color .15s;
+}
+.tab.active {
+  color: #E0E0F0;
+  border-bottom-color: #3A86FF;
+}
+.tab:hover:not(.active) {
+  color: #9090B0;
+}
+.tab-icon {
+  width: 13px;
+  height: 13px;
+}
+.tab-add {
+  color: #3A3A55;
+  font-size: 18px;
+  padding: 0 10px 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 20px 12px;
+}
+.btn-new {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.btn-new-main {
+  background: #2563EB;
+  color: #fff;
+  border: none;
+  padding: 0 16px;
+  height: 100%;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  border-right: 1px solid rgba(255,255,255,.18);
+}
+.btn-new-caret {
+  background: #2563EB;
+  color: #fff;
+  border: none;
+  padding: 0 9px;
+  height: 100%;
+  cursor: pointer;
+}
+.icon-caret {
+  width: 12px;
+  height: 12px;
+}
+.toolbar-sep {
+  width: 1px;
+  height: 20px;
+  background: #1E1E2E;
+}
+.tb-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8080A0;
+  font-size: 12px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+.tb-action:hover {
+  color: #C0C0D8;
+}
+.icon-action {
+  width: 14px;
+  height: 14px;
+}
+.search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-size: 12px;
+  width: 80px;
+  transition: width .2s;
+}
+.search-input:focus {
+  width: 140px;
+}
+.dev-select {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  appearance: none;
+}
+.icon-mini {
+  width: 11px;
+  height: 11px;
+  opacity: .5;
+}
+
+/* ── CONTENT ── */
+.content {
+  padding: 0 16px 16px;
+}
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px 8px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #B0B0C8;
+}
+.icon-section {
+  width: 14px;
+  height: 14px;
+  color: #7C3AED;
+}
+.placeholder-view {
+  padding: 20px 0;
+}
+</style>

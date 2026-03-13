@@ -1,26 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --bg-app: #0F0F17;
-  --bg-table: #181824;
-  --bg-header: #121220;
-  --border-color: #232333;
+  --bg-app: #0D0D14;
+  --bg-table: #13131E;
+  --bg-header: #16161F;
+  --border-color: #1E1E2C;
 }
 
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-app);
-  color: #E1E1E6;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Base resets */
-input, select {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: inherit;
+  color: #C8C8D8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  overflow-x: hidden;
 }
 
 /* Custom scrollbar matching the dark theme */
@@ -29,7 +22,7 @@ input, select {
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0F0F17;
+  background: #0D0D14;
 }
 ::-webkit-scrollbar-thumb {
   background: #2D2D44;
@@ -39,27 +32,10 @@ input, select {
   background: #3D3D58;
 }
 
-/* Global utility classes for the table */
-.main-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--border-color);
+/* Transition utility for the app */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease;
 }
-
-.main-table th {
-  border: 1px solid var(--border-color);
-  padding: 8px 12px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 500;
-  color: #5E5E7A;
-  text-transform: uppercase;
-}
-
-.main-table td {
-  border: 1px solid var(--border-color);
-  padding: 0 8px;
-  font-size: 12px;
-  height: 40px;
-  background-color: var(--bg-table);
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
