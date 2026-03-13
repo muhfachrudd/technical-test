@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --bg-dark: #12121B;
+  --bg-card: #1E1E2D;
+  --bg-header: #151521;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: #E1E1E6;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom styles for the table/kanban as seen in the image */
+.glass-effect {
+  background: rgba(30, 30, 45, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+input, select {
+  background: transparent;
+  color: inherit;
+  border: none;
+}
+
+input:focus, select:focus {
+  outline: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #151521;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D2D44;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3D3D58;
+}
