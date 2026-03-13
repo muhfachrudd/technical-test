@@ -1,48 +1,65 @@
 @import "tailwindcss";
 
 :root {
-  --bg-dark: #12121B;
-  --bg-card: #1E1E2D;
-  --bg-header: #151521;
+  --bg-app: #0F0F17;
+  --bg-table: #181824;
+  --bg-header: #121220;
+  --border-color: #232333;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-app);
   color: #E1E1E6;
   font-family: 'Inter', sans-serif;
 }
 
-/* Custom styles for the table/kanban as seen in the image */
-.glass-effect {
-  background: rgba(30, 30, 45, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
+/* Base resets */
 input, select {
   background: transparent;
-  color: inherit;
   border: none;
-}
-
-input:focus, select:focus {
   outline: none;
+  color: inherit;
 }
 
-/* Scrollbar styling */
+/* Custom scrollbar matching the dark theme */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #151521;
+  background: #0F0F17;
 }
 ::-webkit-scrollbar-thumb {
   background: #2D2D44;
-  border-radius: 4px;
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #3D3D58;
+}
+
+/* Global utility classes for the table */
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+
+.main-table th {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  color: #5E5E7A;
+  text-transform: uppercase;
+}
+
+.main-table td {
+  border: 1px solid var(--border-color);
+  padding: 0 8px;
+  font-size: 12px;
+  height: 40px;
+  background-color: var(--bg-table);
 }
