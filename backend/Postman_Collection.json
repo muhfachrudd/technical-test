@@ -1,0 +1,192 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-4a5b-b6c7-d8e9f0a1b2c3",
+		"name": "Todo App API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Todo",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"Finish Backend Task\",\n    \"assignee\": \"John Doe\",\n    \"due_date\": \"2026-12-31\",\n    \"time_tracked\": 2.5,\n    \"priority\": \"high\",\n    \"status\": \"pending\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/todos",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"todos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Export Excel",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/excel?title=Task&assignee=John Doe,Jane Doe&start_date=2024-01-01&end_date=2026-12-31&min_time=0&max_time=10&status=pending,open&priority=low,high",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"excel"
+					],
+					"query": [
+						{
+							"key": "title",
+							"value": "Task"
+						},
+						{
+							"key": "assignee",
+							"value": "John Doe,Jane Doe"
+						},
+						{
+							"key": "start_date",
+							"value": "2024-01-01"
+						},
+						{
+							"key": "end_date",
+							"value": "2026-12-31"
+						},
+						{
+							"key": "min_time",
+							"value": "0"
+						},
+						{
+							"key": "max_time",
+							"value": "10"
+						},
+						{
+							"key": "status",
+							"value": "pending,open"
+						},
+						{
+							"key": "priority",
+							"value": "low,high"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chart Status Summary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/chart?type=status",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chart"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "status"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chart Priority Summary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/chart?type=priority",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chart"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "priority"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Chart Assignee Summary",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/chart?type=assignee",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chart"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "assignee"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}
