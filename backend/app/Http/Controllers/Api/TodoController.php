@@ -13,6 +13,36 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TodoController extends Controller
 {
+    public function index(Request $request)
+    {
+        $query = Todo::query();
+
+        if ($request->has('title')) {
+            $query->where('title', 'like', '%' . $request->title . '%');
+        }
+
+        if ($request->has('assignee')) {
+            $assignees = explode(',', $request->assignee);
+            $query->whereIn('assignee', $assignees);
+        }
+
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $query->whereBetween('due_date', [$request->start_date, $request->end_date]);
+        }
+
+        if ($request->has('status')) {
+            $statuses = explode(',', $request->status);
+            $query->whereIn('status', $statuses);
+        }
+
+        if ($request->has('priority')) {
+            $priorities = explode(',', $request->priority);
+            $query->whereIn('priority', $priorities);
+        }
+
+        return response()->json($query->latest()->get());
+    }
+
     public function store(StoreTodoRequest $request)
     {
         $validated = $request->validated();
@@ -23,6 +53,18 @@ class TodoController extends Controller
             'message' => 'Todo created successfully',
             'data' => $todo
         ], 201);
+    }
+
+    public function update(StoreTodoRequest $request, Todo $todo)
+    {
+        $todo->update($request->validated());
+        return response()->json(['message' => 'Todo updated successfully', 'data' => $todo]);
+    }
+
+    public function destroy(Todo $todo)
+    {
+        $todo->delete();
+        return response()->json(['message' => 'Todo deleted successfully']);
     }
 
     public function export(Request $request)

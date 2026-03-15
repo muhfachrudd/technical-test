@@ -69,14 +69,17 @@ class TodosExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
             ];
         });
 
-        // Add empty row before summary if needed
+        // Add empty row before summary
         $data->push(['', '', '', '', '', '']);
 
         // Add summary row
         $data->push([
-            'Total Todos:', $totalTodos,
-            'Total Time Tracked:', $totalTimeTracked,
-            '', ''
+            'SUMMARY',
+            'Count: ' . $totalTodos,
+            '',
+            'Total: ' . $totalTimeTracked,
+            '',
+            ''
         ]);
 
         return $data;

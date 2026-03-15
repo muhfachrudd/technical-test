@@ -1,28 +1,102 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import MainTable from './components/MainTable.vue';
 import KanbanBoard from './components/KanbanBoard.vue';
 import TaskModal from './components/TaskModal.vue';
-import { Search, UserCircle2, ArrowUpDown, ChevronDown, List, LayoutGrid, Home } from 'lucide-vue-next';
+import { Search, UserCircle2, ArrowUpDown, ChevronDown, List, LayoutGrid, Home, Download } from 'lucide-vue-next';
 
-import { INITIAL_TASKS } from './utils/dummyData';
+import { todoService } from './services/api';
 
 const activeTab = ref('table');
 const showModal = ref(false);
 const searchQuery = ref('');
 const personFilter = ref('');
 const sortConfig = ref([]);
+const tasks = ref([]);
+const isLoading = ref(false);
 
-const tasks = ref(INITIAL_TASKS);
+const mapToBackend = (task) => ({
+  title: task.task,
+  assignee: task.developer,
+  due_date: task.date || new Date().toISOString().split('T')[0],
+  status: task.status === 'In Progress' ? 'in_progress' : 
+          task.status === 'Waiting for review' ? 'open' : 
+          task.status === 'Done' ? 'completed' : 'pending',
+  priority: task.priority?.toLowerCase() === 'high' ? 'high' : 
+            task.priority?.toLowerCase() === 'medium' ? 'medium' : 'low',
+  time_tracked: task.actual_sp || 0
+});
 
-const addTask = (newTask) => {
-  tasks.value.unshift({ id: Date.now(), ...newTask });
-  showModal.value = false;
+const mapToFrontend = (apiTask) => ({
+  id: apiTask.id,
+  task: apiTask.title,
+  developer: apiTask.assignee,
+  date: apiTask.due_date,
+  status: apiTask.status === 'in_progress' ? 'In Progress' : 
+          apiTask.status === 'open' ? 'Waiting for review' : 
+          apiTask.status === 'completed' ? 'Done' : 'Ready to start',
+  priority: apiTask.priority === 'high' ? 'High' : 
+            apiTask.priority === 'medium' ? 'Medium' : 'Low',
+  actual_sp: apiTask.time_tracked,
+  estimated_sp: apiTask.estimated_sp || 0,
+  type: apiTask.type || 'Other'
+});
+
+const fetchTasks = async () => {
+  isLoading.value = true;
+  try {
+    const params = {};
+    if (searchQuery.value) params.title = searchQuery.value;
+    if (personFilter.value) params.assignee = personFilter.value;
+    
+    const data = await todoService.getTodos(params);
+    tasks.value = data.map(mapToFrontend);
+  } catch (error) {
+    console.error("Failed to fetch tasks:", error);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
-const updateTask = (updatedTask) => {
-  const index = tasks.value.findIndex(t => t.id === updatedTask.id);
-  if (index !== -1) tasks.value[index] = { ...updatedTask };
+onMounted(fetchTasks);
+
+// Re-fetch when filters change (Backend filtering requirement)
+watch([searchQuery, personFilter], fetchTasks);
+
+const addTask = async (newTask) => {
+  try {
+    const backendTask = mapToBackend(newTask);
+    const { data } = await todoService.createTodo(backendTask);
+    tasks.value.unshift(mapToFrontend(data));
+    showModal.value = false;
+  } catch (error) {
+    console.error("Failed to add task:", error);
+  }
+};
+
+const updateTask = async (updatedTask) => {
+  try {
+    const backendTask = mapToBackend(updatedTask);
+    await todoService.updateTodo(updatedTask.id, backendTask);
+    const index = tasks.value.findIndex(t => t.id === updatedTask.id);
+    if (index !== -1) tasks.value[index] = { ...updatedTask };
+  } catch (error) {
+    console.error("Failed to update task:", error);
+  }
+};
+
+const exportData = async () => {
+  try {
+    const response = await todoService.exportExcel();
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'todos.xlsx');
+    document.body.appendChild(link);
+    link.click();
+  } catch (error) {
+    console.error("Failed to export excel:", error);
+  }
 };
 
 const developers = computed(() => {
@@ -110,6 +184,12 @@ const toggleSort = (key) => {
         >
           <ArrowUpDown class="w-4 h-4" />
           <span>Sort: {{ sortConfig.length > 0 ? (sortConfig[0].order === 'asc' ? 'A-Z' : 'Z-A') : 'None' }}</span>
+        </button>
+
+        <!-- Export button -->
+        <button @click="exportData" class="toolbar-btn text-green-400 hover:text-green-300">
+          <Download class="w-4 h-4" />
+          <span>Export Excel</span>
         </button>
 
         <!-- Color Swatches (Only in Kanban Mode) -->
