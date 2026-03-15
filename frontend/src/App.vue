@@ -5,18 +5,15 @@ import KanbanBoard from './components/KanbanBoard.vue';
 import TaskModal from './components/TaskModal.vue';
 import { Search, UserCircle2, ArrowUpDown, ChevronDown, List, LayoutGrid, Home } from 'lucide-vue-next';
 
+import { INITIAL_TASKS } from './utils/dummyData';
+
 const activeTab = ref('table');
 const showModal = ref(false);
 const searchQuery = ref('');
 const personFilter = ref('');
 const sortConfig = ref([]);
 
-const tasks = ref([
-  { id: 1, task: 'Committed Feature', developer: 'Jane', status: 'Ready to start', priority: 'High', type: 'Other', date: '', estimated_sp: 2, actual_sp: 1.5 },
-  { id: 2, task: 'New Task', developer: 'Doe', status: 'In Progress', priority: 'Best Effort', type: 'Feature Enhancement', date: '', estimated_sp: 0, actual_sp: 0 },
-  { id: 3, task: 'New task', developer: 'Jane', status: 'Waiting for review', priority: 'Medium', type: 'Feature Enhancement', date: '', estimated_sp: 0, actual_sp: 0 },
-  { id: 4, task: 'Done Task', developer: 'John', status: 'Done', priority: 'Low', type: 'Other', date: '', estimated_sp: 0, actual_sp: 0 }
-]);
+const tasks = ref(INITIAL_TASKS);
 
 const addTask = (newTask) => {
   tasks.value.unshift({ id: Date.now(), ...newTask });

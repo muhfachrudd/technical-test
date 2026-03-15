@@ -1,15 +1,20 @@
 <script setup>
 import { reactive } from 'vue';
 import { X } from 'lucide-vue-next';
+import { STATUS_OPTIONS, PRIORITY_OPTIONS, TYPE_OPTIONS } from '../utils/constants';
 
 const emit = defineEmits(['close', 'save']);
+
+const statusOptions = STATUS_OPTIONS;
+const priorityOptions = PRIORITY_OPTIONS;
+const typeOptions = TYPE_OPTIONS;
 
 const form = reactive({
   task: '',
   developer: '',
-  status: 'Ready to start',
-  priority: 'Medium',
-  type: 'Other',
+  status: statusOptions[0].name,
+  priority: priorityOptions[2].name, // Medium
+  type: typeOptions[0].name,
   date: new Date().toISOString().split('T')[0],
   estimated_sp: 0,
   actual_sp: 0
@@ -68,31 +73,26 @@ const save = () => {
         <div class="grid grid-cols-3 gap-4">
           <div>
             <label class="block text-xs text-gray-400 mb-1.5 uppercase font-bold tracking-wider">Status</label>
-            <select v-model="form.status" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm">
-                <option>Ready to start</option>
-                <option>In Progress</option>
-                <option>Waiting for review</option>
-                <option>Pending Deploy</option>
-                <option>Done</option>
-                <option>Stuck</option>
+            <select v-model="form.status" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm outline-none">
+                <option v-for="opt in statusOptions" :key="opt.name" :value="opt.name">
+                  {{ opt.name }}
+                </option>
             </select>
           </div>
           <div>
             <label class="block text-xs text-gray-400 mb-1.5 uppercase font-bold tracking-wider">Priority</label>
-            <select v-model="form.priority" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm">
-                <option>Critical</option>
-                <option>High</option>
-                <option>Medium</option>
-                <option>Low</option>
-                <option>Best Effort</option>
+            <select v-model="form.priority" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm outline-none">
+                <option v-for="opt in priorityOptions" :key="opt.name" :value="opt.name">
+                  {{ opt.name }}
+                </option>
             </select>
           </div>
           <div>
             <label class="block text-xs text-gray-400 mb-1.5 uppercase font-bold tracking-wider">Type</label>
-            <select v-model="form.type" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm">
-                <option>Feature Enhancements</option>
-                <option>Other</option>
-                <option>Bug</option>
+            <select v-model="form.type" class="w-full bg-[#151521] border border-gray-700 rounded-lg px-3 py-2.5 text-sm outline-none">
+                <option v-for="opt in typeOptions" :key="opt.name" :value="opt.name">
+                  {{ opt.name }}
+                </option>
             </select>
           </div>
         </div>

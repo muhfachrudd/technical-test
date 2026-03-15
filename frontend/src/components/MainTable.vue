@@ -1,32 +1,14 @@
 <script setup>
 import { computed } from 'vue';
 import { MessageSquare, PlusCircle, User, Info, ChevronDown } from 'lucide-vue-next';
+import { STATUS_OPTIONS, PRIORITY_OPTIONS, TYPE_OPTIONS } from '../utils/constants';
 
 const props = defineProps(['tasks']);
 const emit = defineEmits(['update', 'sort']);
 
-const statusOptions = [
-  { name: 'Waiting for review', color: '#97E4F7', textColor: '#FFFFFF' },
-  { name: 'In Progress', color: '#F6A64C', textColor: '#FFFFFF' },
-  { name: 'Ready to start', color: '#2C64F5', textColor: '#FFFFFF' },
-  { name: 'Pending Deploy', color: '#8B5CF6', textColor: '#FFFFFF' },
-  { name: 'Done', color: '#1BC78D', textColor: '#FFFFFF' },
-  { name: 'Stuck', color: '#EF4444', textColor: '#FFFFFF' }
-];
-
-const priorityOptions = [
-  { name: 'Critical', color: '#EF4444' },
-  { name: 'High', color: '#8B5CF6' },
-  { name: 'Medium', color: '#3A86FF' },
-  { name: 'Low', color: '#6B7280' },
-  { name: 'Best Effort', color: '#94A3B8' }
-];
-
-const typeOptions = [
-  { name: 'Feature Enhancements', color: '#F8BFC8', textColor: '#FFFFFF' },
-  { name: 'Other', color: '#C0B6F2', textColor: '#FFFFFF' },
-  { name: 'Bug', color: '#F43F5E', textColor: '#FFFFFF' }
-];
+const statusOptions = STATUS_OPTIONS;
+const priorityOptions = PRIORITY_OPTIONS;
+const typeOptions = TYPE_OPTIONS;
 
 const updateField = (task, field, value) => {
   emit('update', { ...task, [field]: value });

@@ -2,23 +2,13 @@
 import { computed } from "vue";
 import draggable from "vuedraggable";
 import { MessageSquare, GitBranch } from "lucide-vue-next";
+import { KANBAN_COLUMNS, COLUMN_COLORS, getPriorityColor, getTypeColor } from "../utils/constants";
 
 const props = defineProps(["tasks"]);
 const emit = defineEmits(["update"]);
 
-const columns = [
-  "Ready to start",
-  "In Progress",
-  "Waiting for review",
-  "Done",
-];
-
-const columnColors = {
-  "Ready to start": "#2D7FF9",
-  "In Progress": "#F9B249",
-  "Waiting for review": "#9FE3F0",
-  "Done": "#34D399",
-};
+const columns = KANBAN_COLUMNS;
+const columnColors = COLUMN_COLORS;
 
 const tasksByStatus = computed(() => {
   const map = {};
@@ -33,25 +23,6 @@ const moveTask = (evt, newStatus) => {
     const task = evt.added.element;
     emit("update", { ...task, status: newStatus });
   }
-};
-
-const getPriorityColor = (priority) => {
-  const map = {
-    High: "#A855F7",
-    Medium: "#2D7FF9",
-    "Best Effort": "#F9B249",
-  };
-  return map[priority] || "#6B7280";
-};
-
-const getTypeColor = (type) => {
-  const map = {
-    "Feature Enhancements": "#F472B6",
-    "Feature Enhancement": "#F472B6",
-    Other: "#818CF8",
-    Bug: "#F43F5E",
-  };
-  return map[type] || "#6B7280";
 };
 </script>
 
