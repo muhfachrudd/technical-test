@@ -1,10 +1,17 @@
 <script setup>
 import { computed } from 'vue';
 import { MessageSquare, PlusCircle, User, Info, ChevronDown } from 'lucide-vue-next';
+import { format } from 'date-fns';
 import { STATUS_OPTIONS, PRIORITY_OPTIONS, TYPE_OPTIONS } from '../utils/constants';
 
-const props = defineProps(['tasks']);
+const props = defineProps(['tasks', 'sortConfig']);
 const emit = defineEmits(['update', 'sort']);
+
+const getSortIcon = (key) => {
+  const item = props.sortConfig?.find(s => s.key === key);
+  if (!item) return '';
+  return item.order === 'asc' ? ' ↑' : ' ↓';
+};
 
 const statusOptions = STATUS_OPTIONS;
 const priorityOptions = PRIORITY_OPTIONS;
@@ -47,6 +54,15 @@ const typeStats = computed(() => calculateStats('type', typeOptions));
 
 const totalEstimated = computed(() => props.tasks.reduce((sum, t) => sum + (Number(t.estimated_sp) || 0), 0));
 const totalActual = computed(() => props.tasks.reduce((sum, t) => sum + (Number(t.actual_sp) || 0), 0));
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
+  try {
+    return format(new Date(dateStr), "dd MMM, yyyy");
+  } catch (e) {
+    return dateStr;
+  }
+};
 </script>
 
 <template>
@@ -69,20 +85,32 @@ const totalActual = computed(() => props.tasks.reduce((sum, t) => sum + (Number(
             <th class="w-10 border-r border-b border-[#232333] text-center">
               <input type="checkbox" class="rounded border-gray-700 bg-gray-800">
             </th>
-            <th class="w-[300px] border-r border-b border-[#232333] text-left px-4 font-normal">Task</th>
-            <th class="w-[100px] border-r border-b border-[#232333] text-center font-normal">Developer</th>
-            <th class="w-[140px] border-r border-b border-[#232333] text-center font-normal">Status</th>
-            <th class="w-[140px] border-r border-b border-[#232333] text-center font-normal">Priority</th>
-            <th class="w-[140px] border-r border-b border-[#232333] text-center font-normal">Type</th>
-            <th class="w-[120px] border-r border-b border-[#232333] text-center font-normal">Date</th>
-            <th class="w-[110px] border-r border-b border-[#232333] text-center font-normal">
+            <th @click="emit('sort', 'task')" class="w-[300px] border-r border-b border-[#232333] text-left px-4 font-normal cursor-pointer hover:bg-white/5">
+              Task {{ getSortIcon('task') }}
+            </th>
+            <th @click="emit('sort', 'developer')" class="w-[100px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
+              Developer {{ getSortIcon('developer') }}
+            </th>
+            <th @click="emit('sort', 'status')" class="w-[140px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
+              Status {{ getSortIcon('status') }}
+            </th>
+            <th @click="emit('sort', 'priority')" class="w-[140px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
+              Priority {{ getSortIcon('priority') }}
+            </th>
+            <th @click="emit('sort', 'type')" class="w-[140px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
+              Type {{ getSortIcon('type') }}
+            </th>
+            <th @click="emit('sort', 'date')" class="w-[120px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
+              Date {{ getSortIcon('date') }}
+            </th>
+            <th @click="emit('sort', 'estimated_sp')" class="w-[110px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
               <div class="flex items-center justify-center gap-1">
-                Estimated SP <Info class="w-3.5 h-3.5" />
+                Estimated SP {{ getSortIcon('estimated_sp') }} <Info class="w-3.5 h-3.5" />
               </div>
             </th>
-            <th class="w-[110px] border-r border-b border-[#232333] text-center font-normal">
+            <th @click="emit('sort', 'actual_sp')" class="w-[110px] border-r border-b border-[#232333] text-center font-normal cursor-pointer hover:bg-white/5">
               <div class="flex items-center justify-center gap-1">
-                Actual SP <Info class="w-3.5 h-3.5" />
+                Actual SP {{ getSortIcon('actual_sp') }} <Info class="w-3.5 h-3.5" />
               </div>
             </th>
             <th class="w-10 border-b border-[#232333] text-center font-normal">
@@ -116,13 +144,13 @@ const totalActual = computed(() => props.tasks.reduce((sum, t) => sum + (Number(
               </div>
             </td>
             <!-- Developer -->
-            <td class="text-center border-r border-[#232333]">
-              <div class="flex justify-center">
-                <div class="avatar-placeholder">
-                  <User v-if="!task.developer_avatar" class="w-3.5 h-3.5 text-gray-400" />
-                  <img v-else :src="task.developer_avatar" class="w-full h-full rounded-full" />
-                </div>
-              </div>
+            <td class="text-center border-r border-[#232333] px-2">
+              <input 
+                :value="task.developer" 
+                @change="e => updateField(task, 'developer', e.target.value)"
+                placeholder="Dev"
+                class="bg-transparent border-none outline-none w-full text-center text-gray-300"
+              />
             </td>
             <!-- Status -->
             <td class="p-0 border-r border-[#232333]">
@@ -164,12 +192,15 @@ const totalActual = computed(() => props.tasks.reduce((sum, t) => sum + (Number(
               </select>
             </td>
             <!-- Date -->
-            <td class="text-center border-r border-[#232333] text-gray-400">
+            <td class="text-center border-r border-[#232333] relative group/date">
+              <span class="text-[12px] text-gray-400 group-hover/date:hidden">
+                {{ formatDate(task.date) }}
+              </span>
               <input 
                 type="date" 
                 :value="task.date" 
                 @change="e => updateField(task, 'date', e.target.value)"
-                class="bg-transparent border-none outline-none w-full text-center text-[12px]"
+                class="hidden group-hover/date:block bg-[#1B1B2A] border border-gray-700 rounded outline-none w-full text-center text-[12px] absolute inset-0 z-10"
               />
             </td>
             <!-- Estimated SP -->

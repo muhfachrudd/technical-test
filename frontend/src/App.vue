@@ -25,12 +25,17 @@ const updateTask = (updatedTask) => {
   if (index !== -1) tasks.value[index] = { ...updatedTask };
 };
 
-const developers = computed(() => Array.from(new Set(tasks.value.map(t => t.developer).filter(Boolean))));
+const developers = computed(() => {
+  const allNames = tasks.value.flatMap(t => 
+    t.developer ? t.developer.split(',').map(n => n.trim()) : []
+  );
+  return Array.from(new Set(allNames)).sort();
+});
 
 const filteredTasks = computed(() => {
   let result = [...tasks.value];
   if (searchQuery.value) result = result.filter(t => t.task.toLowerCase().includes(searchQuery.value.toLowerCase()));
-  if (personFilter.value) result = result.filter(t => t.developer === personFilter.value);
+  if (personFilter.value) result = result.filter(t => t.developer && t.developer.includes(personFilter.value));
   if (sortConfig.value.length > 0) {
     result.sort((a, b) => {
       for (const { key, order } of sortConfig.value) {
@@ -119,7 +124,7 @@ const toggleSort = (key) => {
 
     <!-- MAIN CONTENT -->
     <div class="content">
-      <MainTable v-if="activeTab === 'table'" :tasks="filteredTasks" @update="updateTask" @sort="toggleSort" />
+      <MainTable v-if="activeTab === 'table'" :tasks="filteredTasks" :sortConfig="sortConfig" @update="updateTask" @sort="toggleSort" />
       
       <div v-else class="placeholder-view px-6">
         <KanbanBoard :tasks="filteredTasks" @update="updateTask" />

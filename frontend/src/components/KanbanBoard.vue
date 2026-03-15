@@ -1,7 +1,8 @@
 <script setup>
 import { computed } from "vue";
 import draggable from "vuedraggable";
-import { MessageSquare, GitBranch } from "lucide-vue-next";
+import { MessageSquare, GitBranch, Calendar } from "lucide-vue-next";
+import { format } from "date-fns";
 import { KANBAN_COLUMNS, COLUMN_COLORS, getPriorityColor, getTypeColor } from "../utils/constants";
 
 const props = defineProps(["tasks"]);
@@ -9,6 +10,15 @@ const emit = defineEmits(["update"]);
 
 const columns = KANBAN_COLUMNS;
 const columnColors = COLUMN_COLORS;
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
+  try {
+    return format(new Date(dateStr), "dd MMM, yyyy");
+  } catch (e) {
+    return dateStr;
+  }
+};
 
 const tasksByStatus = computed(() => {
   const map = {};
@@ -75,14 +85,15 @@ const moveTask = (evt, newStatus) => {
                   {{ task.estimated_sp }} SP
                 </div>
 
-                <!-- Type Badge (Condensed) -->
-                <div v-if="task.type && task.type === 'Other'" class="badge-custom" :style="{ '--border-color': getTypeColor(task.type) }">
-                  {{ task.type }}
+                <!-- Date Badge -->
+                <div class="badge-custom flex items-center gap-1" style="--border-color: #6B7280">
+                  <Calendar class="w-3 h-3" />
+                  {{ formatDate(task.date) }}
                 </div>
               </div>
 
-              <!-- Full-width Type Label (Conditional like in image) -->
-              <div v-if="task.type && task.type !== 'Other'" 
+              <!-- Full-width Type Label -->
+              <div v-if="task.type" 
                    class="badge-custom mb-3 block w-fit" 
                    :style="{ '--border-color': getTypeColor(task.type) }">
                 {{ task.type }}
@@ -90,10 +101,10 @@ const moveTask = (evt, newStatus) => {
 
               <!-- Footer -->
               <div class="flex items-center justify-between pt-1">
-                <div class="w-7 h-7 rounded-full bg-gray-600 overflow-hidden border border-gray-700">
-                  <img v-if="task.avatar" :src="task.avatar" class="w-full h-full object-cover" />
-                  <div v-else class="w-full h-full flex items-center justify-center text-[10px] text-white bg-indigo-500 uppercase">
-                    {{ task.developer?.[0] }}
+                <div class="flex -space-x-2">
+                  <div v-for="dev in (task.developer ? task.developer.split(',') : [])" :key="dev" 
+                       class="w-7 h-7 rounded-full bg-gray-600 overflow-hidden border border-gray-700 flex items-center justify-center text-[10px] text-white bg-indigo-500 uppercase">
+                    {{ dev.trim()[0] }}
                   </div>
                 </div>
 
