@@ -63,7 +63,7 @@ const totalActual = computed(() => props.tasks.reduce((sum, t) => sum + (Number(
         <!-- HEADER -->
         <thead class="text-[#8E8E9F] bg-[#16161F]">
           <tr class="h-10">
-            <th class="w-10 border-r border-b border-[#232333]">
+            <th class="w-1 border-r border-b border-[#232333]">
               <!-- Left indicator space -->
             </th>
             <th class="w-10 border-r border-b border-[#232333] text-center">

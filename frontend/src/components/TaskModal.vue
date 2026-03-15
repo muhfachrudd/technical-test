@@ -13,7 +13,7 @@ const form = reactive({
   task: '',
   developer: '',
   status: statusOptions[0].name,
-  priority: priorityOptions[2].name, // Medium
+  priority: priorityOptions[2].name,
   type: typeOptions[0].name,
   date: new Date().toISOString().split('T')[0],
   estimated_sp: 0,

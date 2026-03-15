@@ -72,15 +72,39 @@ const toggleSort = (key) => {
         <button class="btn-new-caret"><ChevronDown class="w-4 h-4" /></button>
       </div>
 
-      <div class="flex items-center gap-8 text-[14px] text-gray-400">
-        <button class="toolbar-btn">
-          <Search class="w-4 h-4" /> Search
-        </button>
-        <button class="toolbar-btn">
-          <UserCircle2 class="w-4 h-4" /> Person
-        </button>
-        <button class="toolbar-btn" @click="sortConfig = []">
-          <ArrowUpDown class="w-4 h-4" /> Sort
+      <div class="flex items-center gap-6 text-[14px] text-gray-400">
+        <!-- Search Input -->
+        <div class="flex items-center gap-2 bg-[#1E1E2D] px-3 py-1 rounded border border-gray-800 focus-within:border-blue-500 transition-colors">
+          <Search class="w-4 h-4" />
+          <input 
+            v-model="searchQuery" 
+            type="text" 
+            placeholder="Search tasks..." 
+            class="bg-transparent border-none outline-none text-white text-[13px] w-32"
+          />
+        </div>
+
+        <!-- Person Filter Dropdown -->
+        <div class="flex items-center gap-2 group relative">
+          <UserCircle2 class="w-4 h-4 cursor-pointer" />
+          <select 
+            v-model="personFilter" 
+            class="bg-transparent border-none outline-none text-gray-400 hover:text-white cursor-pointer text-[13px] appearance-none"
+          >
+            <option value="" class="bg-[#1E1E2D]">Person: All</option>
+            <option v-for="dev in developers" :key="dev" :value="dev" class="bg-[#1E1E2D]">
+              {{ dev }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Sort Toggle -->
+        <button 
+          @click="toggleSort('task')" 
+          :class="['toolbar-btn flex items-center gap-2', { 'text-blue-400': sortConfig.length > 0 }]"
+        >
+          <ArrowUpDown class="w-4 h-4" />
+          <span>Sort: {{ sortConfig.length > 0 ? (sortConfig[0].order === 'asc' ? 'A-Z' : 'Z-A') : 'None' }}</span>
         </button>
 
         <!-- Color Swatches (Only in Kanban Mode) -->
