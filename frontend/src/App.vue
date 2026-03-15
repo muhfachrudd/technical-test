@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import MainTable from './components/MainTable.vue';
 import KanbanBoard from './components/KanbanBoard.vue';
 import TaskModal from './components/TaskModal.vue';
-import { Search, Users, SortDesc, ChevronDown, List, LayoutGrid, Home } from 'lucide-vue-next';
+import { Search, UserCircle2, ArrowUpDown, ChevronDown, List, LayoutGrid, Home } from 'lucide-vue-next';
 
 const activeTab = ref('table');
 const showModal = ref(false);
@@ -12,10 +12,10 @@ const personFilter = ref('');
 const sortConfig = ref([]);
 
 const tasks = ref([
-  { id: 1, task: 'New Task', developer: 'John', status: 'Waiting for review', priority: 'Medium', type: 'Feature Enhancements', date: '2026-03-13', estimated_sp: 0, actual_sp: 0 },
-  { id: 2, task: 'New task', developer: 'Jane', status: 'In Progress', priority: 'Best Effort', type: 'Feature Enhancements', date: '2026-03-14', estimated_sp: 0, actual_sp: 0 },
-  { id: 3, task: 'New Task', developer: 'Doe', status: 'In Progress', priority: 'Best Effort', type: 'Feature Enhancements', date: '2026-03-15', estimated_sp: 0, actual_sp: 0 },
-  { id: 4, task: 'Committed Feature', developer: 'Jane', status: 'Ready to start', priority: 'High', type: 'Other', date: '2026-03-16', estimated_sp: 2, actual_sp: 1.5 }
+  { id: 1, task: 'Committed Feature', developer: 'Jane', status: 'Ready to start', priority: 'High', type: 'Other', date: '', estimated_sp: 2, actual_sp: 1.5 },
+  { id: 2, task: 'New Task', developer: 'Doe', status: 'In Progress', priority: 'Best Effort', type: 'Feature Enhancement', date: '', estimated_sp: 0, actual_sp: 0 },
+  { id: 3, task: 'New task', developer: 'Jane', status: 'Waiting for review', priority: 'Medium', type: 'Feature Enhancement', date: '', estimated_sp: 0, actual_sp: 0 },
+  { id: 4, task: 'Done Task', developer: 'John', status: 'Done', priority: 'Low', type: 'Other', date: '', estimated_sp: 0, actual_sp: 0 }
 ]);
 
 const addTask = (newTask) => {
@@ -57,55 +57,50 @@ const toggleSort = (key) => {
 <template>
   <div class="app-layout">
     <!-- TABS -->
-    <div class="tabs">
+    <div class="tabs px-6 border-b border-[#232333] mb-4">
       <button @click="activeTab = 'table'" 
               :class="['tab', { active: activeTab === 'table' }]">
-        <Home class="tab-icon" /> Main Table
+        <Home class="w-4 h-4" /> Main Table
       </button>
       <button @click="activeTab = 'kanban'" 
               :class="['tab', { active: activeTab === 'kanban' }]">
         Kanban
       </button>
-      <button class="tab-add">+</button>
     </div>
 
     <!-- TOOLBAR -->
-    <div class="toolbar">
-      <div class="btn-new">
-        <button class="btn-new-main" @click="showModal = true">New task</button>
-        <button class="btn-new-caret"><ChevronDown class="icon-caret" /></button>
+    <div class="toolbar px-6 py-2 flex items-center gap-6 mb-2">
+      <div class="btn-new-group">
+        <button class="btn-new" @click="showModal = true">New task</button>
+        <button class="btn-new-caret"><ChevronDown class="w-4 h-4" /></button>
       </div>
 
-      <div class="toolbar-sep"></div>
+      <div class="flex items-center gap-8 text-[14px] text-gray-400">
+        <button class="toolbar-btn">
+          <Search class="w-4 h-4" /> Search
+        </button>
+        <button class="toolbar-btn">
+          <UserCircle2 class="w-4 h-4" /> Person
+        </button>
+        <button class="toolbar-btn" @click="sortConfig = []">
+          <ArrowUpDown class="w-4 h-4" /> Sort
+        </button>
 
-      <div class="tb-action">
-        <Search class="icon-action" />
-        <input v-model="searchQuery" placeholder="Search" class="search-input" />
+        <!-- Color Swatches (Only in Kanban Mode) -->
+        <div v-if="activeTab === 'kanban'" class="flex items-center gap-0.5 ml-2">
+          <div class="w-10 h-4 rounded-s" style="background-color: #2D7FF9;"></div>
+          <div class="w-10 h-4" style="background-color: #F9B249;"></div>
+          <div class="w-10 h-4 rounded-e" style="background-color: #9FE3F0;"></div>
+        </div>
       </div>
-
-      <div class="tb-action">
-        <Users class="icon-action" />
-        <select v-model="personFilter" class="dev-select">
-          <option value="">Person</option>
-          <option v-for="dev in developers" :key="dev" :value="dev">{{ dev }}</option>
-        </select>
-        <ChevronDown class="icon-mini" />
-      </div>
-
-      <button class="tb-action" @click="sortConfig = []">
-        <SortDesc class="icon-action" /> Sort
-      </button>
     </div>
+
 
     <!-- MAIN CONTENT -->
     <div class="content">
-      <div class="section-label">
-        <ChevronDown class="icon-section" /> All Task
-      </div>
-
       <MainTable v-if="activeTab === 'table'" :tasks="filteredTasks" @update="updateTask" @sort="toggleSort" />
       
-      <div v-else class="placeholder-view">
+      <div v-else class="placeholder-view px-6">
         <KanbanBoard :tasks="filteredTasks" @update="updateTask" />
       </div>
     </div>
@@ -116,7 +111,6 @@ const toggleSort = (key) => {
 </template>
 
 <style>
-/* Global resets for the app specifically */
 .app-layout {
   min-height: 100vh;
   background: #0D0D14;
@@ -127,152 +121,81 @@ const toggleSort = (key) => {
 /* ── TABS ── */
 .tabs {
   display: flex;
-  align-items: flex-end;
-  padding: 0 20px;
-  border-bottom: 1px solid #1E1E2E;
-  height: 50px;
+  align-items: center;
+  gap: 12px;
+  height: 48px;
 }
 .tab {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 14px;
+  gap: 8px;
+  padding: 0 16px;
   height: 100%;
-  font-size: 12px;
-  font-weight: 500;
-  color: #555570;
+  font-size: 13px;
+  color: #8E8E9F;
   border: none;
   background: none;
-  border-bottom: 2.5px solid transparent;
+  border-bottom: 2px solid transparent;
   cursor: pointer;
-  transition: color .15s;
+  transition: all .2s;
 }
 .tab.active {
-  color: #E0E0F0;
-  border-bottom-color: #3A86FF;
+  color: #fff;
+  border-bottom-color: #2D7FF9;
+  border-bottom-width: 2px;
 }
 .tab:hover:not(.active) {
-  color: #9090B0;
-}
-.tab-icon {
-  width: 13px;
-  height: 13px;
+  color: #fff;
 }
 .tab-add {
-  color: #3A3A55;
-  font-size: 18px;
-  padding: 0 10px 4px;
-  cursor: pointer;
+  color: #555570;
+  font-size: 20px;
   background: none;
   border: none;
+  cursor: pointer;
 }
 
 /* ── TOOLBAR ── */
-.toolbar {
+.btn-new-group {
   display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 14px 20px 12px;
-}
-.btn-new {
-  display: flex;
-  align-items: center;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 4px;
   overflow: hidden;
 }
-.btn-new-main {
+.btn-new {
   background: #2563EB;
   color: #fff;
   border: none;
   padding: 0 16px;
-  height: 100%;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  border-right: 1px solid rgba(255,255,255,.18);
+  border-right: 1px solid rgba(0,0,0,0.1);
 }
+.btn-new:hover { background: #1D4ED8; }
 .btn-new-caret {
   background: #2563EB;
   color: #fff;
   border: none;
-  padding: 0 9px;
-  height: 100%;
+  padding: 0 8px;
   cursor: pointer;
 }
-.icon-caret {
-  width: 12px;
-  height: 12px;
-}
-.toolbar-sep {
-  width: 1px;
-  height: 20px;
-  background: #1E1E2E;
-}
-.tb-action {
+.btn-new-caret:hover { background: #1D4ED8; }
+
+.toolbar-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #8080A0;
-  font-size: 12px;
-  cursor: pointer;
+  gap: 8px;
   background: none;
   border: none;
-  padding: 0;
-}
-.tb-action:hover {
-  color: #C0C0D8;
-}
-.icon-action {
-  width: 14px;
-  height: 14px;
-}
-.search-input {
-  background: transparent;
-  border: none;
-  outline: none;
   color: inherit;
-  font-size: 12px;
-  width: 80px;
-  transition: width .2s;
-}
-.search-input:focus {
-  width: 140px;
-}
-.dev-select {
-  background: transparent;
-  border: none;
-  outline: none;
-  color: inherit;
-  font-size: 12px;
+  font-size: 13px;
   cursor: pointer;
-  appearance: none;
 }
-.icon-mini {
-  width: 11px;
-  height: 11px;
-  opacity: .5;
-}
+.toolbar-btn:hover { color: #fff; }
 
-/* ── CONTENT ── */
 .content {
-  padding: 0 16px 16px;
-}
-.section-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 4px 8px;
-  font-size: 12.5px;
-  font-weight: 700;
-  color: #B0B0C8;
-}
-.icon-section {
-  width: 14px;
-  height: 14px;
-  color: #7C3AED;
-}
-.placeholder-view {
-  padding: 20px 0;
+  padding-top: 0;
 }
 </style>
+
